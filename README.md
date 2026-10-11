@@ -16,8 +16,8 @@ gray plugin install /path/to/gray-themes    # or `gray plugin register` the bina
 Inside gray:
 
 ```
-/themes                  # list all 29 palettes (● active, ✓ installed)
-/themes use saga         # writes ~/.gray/themes/hancore-saga.json
+/hancore                  # list all 29 palettes (● active, ✓ installed)
+/hancore use saga         # writes ~/.gray/hancore/hancore-saga.json
 /theme hancore-saga      # built-in: switch the live palette
 ```
 
@@ -53,5 +53,5 @@ filling the derived roles. Run `python3 scripts/sync.py` to refresh from
 upstream, then rebuild.
 
 Sidecar: NDJSON wire per the gray plugin contract — `plugin/manifest`,
-`command/run` (`/themes`), `plugin/shutdown`. No tools, no hooks, no
+`command/run` (`/hancore`), `plugin/shutdown`. No tools, no hooks, no
 capabilities.

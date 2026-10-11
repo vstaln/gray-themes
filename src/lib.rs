@@ -2,7 +2,7 @@
 //!
 //! Ships 29 converted `omarchy-*-theme` palettes (github.com/HANCORE-linux)
 //! as embedded gray theme files. Installing one is just writing
-//! `~/.gray/themes/hancore-<name>.json`; the built-in `/theme` command does
+//! `~/.gray/hancore/hancore-<name>.json`; the built-in `/theme` command does
 //! the live switch (a sidecar can't flip the palette — `/theme` is
 //! TUI-local), so `use` answers with the command to run.
 //!
@@ -10,7 +10,7 @@
 //! - `gray themes <verb>` → CLI surface via the host's `cli_argv` forward:
 //!   `list`, `use <name>` (install + set `"theme"` in config.json),
 //!   `install [name|all]`, `show <name>`, `path`
-//! - bare on a pipe → NDJSON sidecar: `command/run` carries `/themes …`
+//! - bare on a pipe → NDJSON sidecar: `command/run` carries `/hancore …`
 //!
 //! Regenerate `themes/` from upstream with `scripts/sync.py`.
 
@@ -58,7 +58,7 @@ fn manifest() -> Value {
         "version": env!("CARGO_PKG_VERSION"),
         "protocol": "1.1",
         "tools": [],
-        "commands": ["/themes"],
+        "commands": ["/hancore"],
         "hooks": [],
         "completion": ["list", "use", "install", "show", "path"],
     })
@@ -149,7 +149,7 @@ fn list() -> String {
         ));
     }
     out.push_str(
-        "● active · ✓ installed · /themes use <name> then /theme <name> to switch",
+        "● active · ✓ installed · /hancore use <name> then /theme <name> to switch",
     );
     out
 }
@@ -167,10 +167,10 @@ fn show(entry: &(&str, &str)) -> String {
     out
 }
 
-const USAGE: &str = "usage: themes [list | use <name> | install [name|all] | show <name> | path]
+const USAGE: &str = "usage: hancore [list | use <name> | install [name|all] | show <name> | path]
   list             all 29 hancore palettes (● active, ✓ installed)
   use <name>       install + select it (CLI also writes config.json)
-  install [name]   write theme file(s) into ~/.gray/themes
+  install [name]   write theme file(s) into ~/.gray/hancore
   show <name>      dump a palette
   path             the themes dir";
 
@@ -180,7 +180,7 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
         Some("path") => themes_dir().display().to_string(),
         Some("show") => match argv.get(1).and_then(|n| find(n)) {
             Some(entry) => show(entry),
-            None => format!("no such theme `{}` — /themes list", argv.get(1).map_or("", String::as_str)),
+            None => format!("no such theme `{}` — /hancore list", argv.get(1).map_or("", String::as_str)),
         },
         Some("install") => match argv.get(1).map(String::as_str) {
             None | Some("all") => {
@@ -201,12 +201,12 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
                     Ok(()) => format!("✓ installed {} → {}", entry.0, themes_dir().display()),
                     Err(e) => format!("install failed: {e}"),
                 },
-                None => format!("no such theme `{name}` — /themes list"),
+                None => format!("no such theme `{name}` — /hancore list"),
             },
         },
         Some("use") => {
             let Some(name) = argv.get(1) else {
-                return "usage: themes use <name>".into();
+                return "usage: hancore use <name>".into();
             };
             match find(name) {
                 Some(entry) => match install(entry) {
@@ -223,7 +223,7 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
                     }
                     Err(e) => format!("install failed: {e}"),
                 },
-                None => format!("no such theme `{name}` — /themes list"),
+                None => format!("no such theme `{name}` — /hancore list"),
             }
         }
         _ => USAGE.into(),
