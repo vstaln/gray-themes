@@ -1,8 +1,8 @@
 # gray-themes
 
-The [HANCORE-linux](https://github.com/HANCORE-linux) palette pack for
-[gray](https://github.com/vstaln/gray) — 29 `omarchy-*-theme` color schemes
-converted to gray theme files.
+A 29-palette theme pack for [gray](https://github.com/vstaln/gray) —
+color schemes converted from upstream `colors.toml` files (each theme
+file names its source).
 
 ## Install
 
@@ -16,10 +16,12 @@ gray plugin install /path/to/gray-themes    # or `gray plugin register` the bina
 Inside gray:
 
 ```
-/hancore                  # list all 29 palettes (● active, ✓ installed)
-/hancore use saga         # writes ~/.gray/hancore/hancore-saga.json
-/theme hancore-saga      # built-in: switch the live palette
+/palettes                # list all 29 palettes (● active, ✓ installed)
+/palettes use saga       # writes ~/.gray/themes/saga.json
+/theme saga              # built-in: switch the live palette
 ```
+
+(`/palettes` rather than `/themes` — that's a built-in alias of `/theme`.)
 
 From the shell (`gray <name> <verb>` forwards to this binary):
 
@@ -31,8 +33,8 @@ gray themes show oxocarbon       # dump a palette
 gray themes path                 # the themes dir
 ```
 
-Names resolve with or without the `hancore-` prefix (`use saga` ≡
-`use hancore-saga`). GRAY_HOME is respected.
+GRAY_HOME is respected. Install never overwrites a theme file that
+didn't come from this pack (pack files carry a `_source` marker).
 
 ## Themes
 
@@ -53,5 +55,5 @@ filling the derived roles. Run `python3 scripts/sync.py` to refresh from
 upstream, then rebuild.
 
 Sidecar: NDJSON wire per the gray plugin contract — `plugin/manifest`,
-`command/run` (`/hancore`), `plugin/shutdown`. No tools, no hooks, no
+`command/run` (`/palettes`), `plugin/shutdown`. No tools, no hooks, no
 capabilities.

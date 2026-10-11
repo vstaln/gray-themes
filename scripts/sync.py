@@ -176,7 +176,7 @@ def main():
             text = fetch(name)
             cache.write_text(text)
         src = parse_colors_toml(text)
-        out = OUT / f"hancore-{name}.json"
+        out = OUT / f"{name}.json"
         out.write_text(convert(name, src))
         print(f"wrote {out.name}")
     print(f"{len(REPOS)} themes → {OUT}")
