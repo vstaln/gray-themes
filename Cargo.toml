@@ -1,0 +1,21 @@
+[package]
+name = "gray-themes"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.91"
+license = "MIT"
+description = "HANCORE-linux palette pack: /themes installer for ~/.gray/themes"
+
+[[bin]]
+name = "gray-themes"
+path = "src/main.rs"
+
+[lib]
+name = "gray_themes"
+path = "src/lib.rs"
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+strip = true

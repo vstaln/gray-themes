@@ -1,0 +1,63 @@
+# UI Colors (extended)
+accent = "#525e5a"
+cursor = "#D6D0C5"
+
+# Primary colors
+foreground = "#D6D0C5"
+background = "#050505"
+
+# Selection colors
+selection_foreground = "#050505"
+selection_background = "#D6D0C5"
+
+mode = "dark"
+
+selection = "#1e1e1e"
+muted = "#7b7873"
+
+hyprland_active_border = "rgba(525e5aee) rgba(525e5aee) rgba(8B9388ee) rgba(8B9388ee) rgba(da614eee) rgba(da614eee) 90deg"
+hyprland_inactive_border = "rgb(050505)"
+
+dark_background = "#040404"
+darker_background = "#030303"
+lighter_background = "#141414"
+
+dark_foreground = "#a19c94"
+light_foreground = "#dcd7ce"
+bright_foreground = "#FFF9ED"
+
+red = "#da614e"
+yellow = "#51605b"
+orange = "#e07969"
+green = "#8B9388"
+cyan = "#717C7C"
+blue = "#75897F"
+magenta = "#C2A46D"
+brown = "#86493f"
+
+bright_red = "#df6124"
+bright_yellow = "#8B9388"
+bright_green = "#525e5a"
+bright_cyan = "#52565e"
+bright_blue = "#75897F"
+bright_magenta = "#C2A46D"
+
+# Normal colors (ANSI 0-7)
+color0 = "#050505"
+color1 = "#da614e"
+color2 = "#8B9388"
+color3 = "#51605b"
+color4 = "#75897F"
+color5 = "#C2A46D"
+color6 = "#717C7C"
+color7 = "#D6D0C5"
+
+# Bright colors (ANSI 8-15)
+color8 = "#404040"
+color9 = "#df6124"
+color10 = "#525e5a"
+color11 = "#8B9388"
+color12 = "#75897F"
+color13 = "#C2A46D"
+color14 = "#52565e"
+color15 = "#FFF9ED"
