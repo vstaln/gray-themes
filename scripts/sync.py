@@ -33,6 +33,28 @@ REPOS = [
     "solitude", "thegreek", "turbonite", "velvetnight", "whitegold",
 ]
 
+HANCORE_SOURCE = "https://github.com/HANCORE-linux/omarchy-{}-theme"
+NORD_SOURCE = "https://github.com/nordtheme/nord"
+
+NORD = {
+    "nord0": "#2e3440",
+    "nord1": "#3b4252",
+    "nord2": "#434c5e",
+    "nord3": "#4c566a",
+    "nord4": "#d8dee9",
+    "nord5": "#e5e9f0",
+    "nord6": "#eceff4",
+    "nord7": "#8fbcbb",
+    "nord8": "#88c0d0",
+    "nord9": "#81a1c1",
+    "nord10": "#5e81ac",
+    "nord11": "#bf616a",
+    "nord12": "#d08770",
+    "nord13": "#ebcb8b",
+    "nord14": "#a3be8c",
+    "nord15": "#b48ead",
+}
+
 
 def hex2rgb(h):
     h = h.lstrip("#")
@@ -75,7 +97,7 @@ def fetch(name):
     return base64.b64decode(raw).decode()
 
 
-def convert(name, src):
+def convert(name, src, source_url):
     get = lambda k: src.get(k, "").strip() or None
 
     bg = hex2rgb(get("background") or "#161616")
@@ -153,14 +175,80 @@ def convert(name, src):
         "bezel_hi": h(mix(bg, fg, 0.42)),
         "bezel_mid": h(mix(bg, fg, 0.26)),
         "bezel_lo": h(mix(bg, fg, 0.12)),
+        "hue_red": "red",
+        "hue_orange": "orange",
+        "hue_yellow": "yellow",
+        "hue_green": "green",
+        "hue_cyan": "cyan",
+        "hue_blue": "blue",
+        "hue_magenta": "magenta",
     }
     doc = {
-        "_source": f"https://github.com/HANCORE-linux/omarchy-{name}-theme",
+        "_source": source_url,
         "_mode": "dark" if dark else "light",
         "vars": vars_,
         "colors": colors,
     }
     return json.dumps(doc, indent=2) + "\n"
+
+
+def nord_sources():
+    n = NORD
+    base = {
+        "mode": "dark",
+        "background": n["nord0"],
+        "lighter_background": n["nord1"],
+        "foreground": n["nord4"],
+        "light_foreground": n["nord6"],
+        "muted": "#616e88",
+        "accent": n["nord8"],
+        "selection_background": n["nord2"],
+        "selection_foreground": n["nord0"],
+        "red": n["nord11"],
+        "orange": n["nord12"],
+        "yellow": n["nord13"],
+        "green": n["nord14"],
+        "magenta": n["nord15"],
+        "blue": n["nord9"],
+        "cyan": n["nord7"],
+        "color0": n["nord1"],
+        "color1": n["nord11"],
+        "color2": n["nord14"],
+        "color3": n["nord13"],
+        "color4": n["nord9"],
+        "color5": n["nord15"],
+        "color6": n["nord8"],
+        "color7": n["nord5"],
+        "color8": n["nord3"],
+        "color9": n["nord11"],
+        "color10": n["nord14"],
+        "color11": n["nord13"],
+        "color12": n["nord9"],
+        "color13": n["nord15"],
+        "color14": n["nord7"],
+        "color15": n["nord6"],
+    }
+    darker = dict(base, background="#242933", lighter_background=n["nord0"])
+    shade = lambda c: rgb2hex(mix(hex2rgb(c), hex2rgb(n["nord0"]), 0.25))
+    light = {
+        "mode": "light",
+        "background": n["nord6"],
+        "lighter_background": n["nord5"],
+        "foreground": n["nord0"],
+        "light_foreground": "#242933",
+        "muted": "#7b88a1",
+        "accent": n["nord10"],
+        "selection_background": n["nord4"],
+        "selection_foreground": n["nord6"],
+        "red": shade(n["nord11"]),
+        "orange": shade(n["nord12"]),
+        "yellow": shade(n["nord13"]),
+        "green": shade(n["nord14"]),
+        "magenta": shade(n["nord15"]),
+        "blue": n["nord10"],
+        "cyan": shade(n["nord7"]),
+    }
+    return {"nord": base, "nord-darker": darker, "nord-light": light}
 
 
 def main():
@@ -177,9 +265,13 @@ def main():
             cache.write_text(text)
         src = parse_colors_toml(text)
         out = OUT / f"{name}.json"
-        out.write_text(convert(name, src))
+        out.write_text(convert(name, src, HANCORE_SOURCE.format(name)))
         print(f"wrote {out.name}")
-    print(f"{len(REPOS)} themes → {OUT}")
+    for name, src in nord_sources().items():
+        out = OUT / f"{name}.json"
+        out.write_text(convert(name, src, NORD_SOURCE))
+        print(f"wrote {out.name}")
+    print(f"{len(REPOS) + 3} themes → {OUT}")
 
 
 if __name__ == "__main__":

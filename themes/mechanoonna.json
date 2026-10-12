@@ -57,6 +57,13 @@
     "shimmer_base": "#c4b8a0",
     "bezel_hi": "#756f61",
     "bezel_mid": "#534f46",
-    "bezel_lo": "#35332e"
+    "bezel_lo": "#35332e",
+    "hue_red": "red",
+    "hue_orange": "orange",
+    "hue_yellow": "yellow",
+    "hue_green": "green",
+    "hue_cyan": "cyan",
+    "hue_blue": "blue",
+    "hue_magenta": "magenta"
   }
 }

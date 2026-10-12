@@ -1,4 +1,4 @@
-//! gray-themes — a 29-palette theme pack for gray.
+//! gray-themes — a 32-palette theme pack for gray.
 //!
 //! Ships palettes converted from upstream `colors.toml` files (provenance
 //! in each file's `_source`) as embedded gray theme files. Installing one
@@ -39,6 +39,9 @@ static THEMES: &[(&str, &str)] = &[
     ("lasthorizon", include_str!("../themes/lasthorizon.json")),
     ("mechanoonna", include_str!("../themes/mechanoonna.json")),
     ("moodpeak", include_str!("../themes/moodpeak.json")),
+    ("nord", include_str!("../themes/nord.json")),
+    ("nord-darker", include_str!("../themes/nord-darker.json")),
+    ("nord-light", include_str!("../themes/nord-light.json")),
     ("oxford", include_str!("../themes/oxford.json")),
     ("oxocarbon", include_str!("../themes/oxocarbon.json")),
     ("roseofdune", include_str!("../themes/roseofdune.json")),
@@ -172,7 +175,7 @@ fn show(entry: &(&str, &str)) -> String {
 }
 
 const USAGE: &str = "usage: palettes [list | use <name> | install [name|all] | show <name> | path]
-  list             all 29 palettes (● active, ✓ installed)
+  list             all 32 palettes (● active, ✓ installed)
   use <name>       install + select it (CLI also writes config.json)
   install [name]   write theme file(s) into ~/.gray/themes
   show <name>      dump a palette
