@@ -8,7 +8,7 @@ use std::io::Write;
 
 use serde_json::Value;
 
-use crate::{themes_dir, THEMES};
+use crate::{THEMES, themes_dir};
 
 pub struct Row {
     pub name: String,
@@ -83,7 +83,9 @@ fn swatch(json: &str) -> String {
     let (br, bg_, bb) = rgb(hex("bg"));
     let (fr, fg, fb) = rgb(hex("fg"));
     let (ar, ag, ab) = rgb(hex("accent"));
-    format!("\x1b[48;2;{br};{bg_};{bb}m \x1b[48;2;{fr};{fg};{fb}m \x1b[48;2;{ar};{ag};{ab}m \x1b[0m")
+    format!(
+        "\x1b[48;2;{br};{bg_};{bb}m \x1b[48;2;{fr};{fg};{fb}m \x1b[48;2;{ar};{ag};{ab}m \x1b[0m"
+    )
 }
 
 fn row_swatch(row: &Row) -> String {
@@ -94,8 +96,7 @@ fn row_swatch(row: &Row) -> String {
         Some(j) => Some((*j).to_string()),
         None => std::fs::read_to_string(themes_dir().join(format!("{}.json", row.name))).ok(),
     };
-    json.map(|j| swatch(&j))
-        .unwrap_or_else(|| "   ".into())
+    json.map(|j| swatch(&j)).unwrap_or_else(|| "   ".into())
 }
 
 /// Interactive picker. Returns the applied theme name (`"gray"` = built-in)
@@ -124,7 +125,11 @@ pub fn pick() -> Option<String> {
             } else {
                 "pack — installs on apply"
             };
-            buf.push_str(&format!("{mark} {:<16} {} {tag}\r\n", r.name, row_swatch(r)));
+            buf.push_str(&format!(
+                "{mark} {:<16} {} {tag}\r\n",
+                r.name,
+                row_swatch(r)
+            ));
         }
         let _ = write!(out, "{buf}");
         let _ = out.flush();
