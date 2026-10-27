@@ -198,7 +198,10 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
         Some("path") => themes_dir().display().to_string(),
         Some("show") => match argv.get(1).and_then(|n| find(n)) {
             Some(entry) => show(entry),
-            None => format!("no such theme `{}` — /palettes list", argv.get(1).map_or("", String::as_str)),
+            None => format!(
+                "no such theme `{}` — /palettes list",
+                argv.get(1).map_or("", String::as_str)
+            ),
         },
         Some("install") => match argv.get(1).map(String::as_str) {
             None | Some("all") => {
@@ -213,7 +216,11 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
                 if errs.is_empty() {
                     format!("✓ installed {n} themes → {}", themes_dir().display())
                 } else {
-                    format!("installed {n}, skipped {}:\n{}", errs.len(), errs.join("\n"))
+                    format!(
+                        "installed {n}, skipped {}:\n{}",
+                        errs.len(),
+                        errs.join("\n")
+                    )
                 }
             }
             Some(name) => match find(name) {
@@ -250,50 +257,88 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
     }
 }
 
-/// `/theme` surface: bare hands the terminal to the picker; `list`/`new`/`<name>`
-/// answer inline. Applies request a host restart (config is written first).
+fn theme_list() -> String {
+    let active = saved_theme();
+    let mut out = format!("themes — ~/.gray/themes + {} pack palettes\n", THEMES.len());
+    for r in picker::rows() {
+        let mark = if active.as_deref() == Some(r.name.as_str()) || (active.is_none() && r.builtin)
+        {
+            "●"
+        } else {
+            " "
+        };
+        let tag = if r.builtin {
+            " (built-in)"
+        } else if !r.installed {
+            " — pack, installs on apply"
+        } else {
+            ""
+        };
+        out.push_str(&format!("  {mark} {}{tag}\n", r.name));
+    }
+    out.push_str("/theme <name> to switch · /theme new <name> to copy the saved one");
+    out
+}
+
 fn theme_run(argv: &[String]) -> (Value, bool) {
     let arg = argv.first().map(String::as_str).unwrap_or("");
     match arg.split_whitespace().collect::<Vec<_>>().as_slice() {
-        [] => (json!({ "terminal": ["theme"], "text": "opening the theme picker…" }), false),
-        ["list"] => {
-            let active = saved_theme();
-            let mut out = format!("themes — ~/.gray/themes + {} pack palettes\n", THEMES.len());
-            for r in picker::rows() {
-                let mark = if active.as_deref() == Some(r.name.as_str())
-                    || (active.is_none() && r.builtin) { "●" } else { " " };
-                let tag = if r.builtin { " (built-in)" }
-                    else if !r.installed { " — pack, installs on apply" } else { "" };
-                out.push_str(&format!("  {mark} {}{tag}\n", r.name));
+        [] => {
+            for entry in THEMES {
+                if !installed(entry.0) {
+                    let _ = install(entry);
+                }
             }
-            out.push_str("/theme <name> to switch · /theme new <name> to copy the saved one");
-            (json!({ "text": out }), false)
+            (json!({ "theme_picker": true, "text": theme_list() }), false)
         }
+        ["list"] => (json!({ "text": theme_list() }), false),
         ["new", name] => {
-            if name.is_empty() || !name.chars().all(|c| c.is_ascii_alphanumeric() || "-_".contains(c))
-                || *name == "gray" || name.eq_ignore_ascii_case("default") {
-                return (json!({ "text": format!("`{name}` can't be a theme name") }), false);
+            if name.is_empty()
+                || !name
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || "-_".contains(c))
+                || *name == "gray"
+                || name.eq_ignore_ascii_case("default")
+            {
+                return (
+                    json!({ "text": format!("`{name}` can't be a theme name") }),
+                    false,
+                );
             }
             let path = themes_dir().join(format!("{name}.json"));
             if path.exists() {
-                return (json!({ "text": format!("{} already exists", path.display()) }), false);
+                return (
+                    json!({ "text": format!("{} already exists", path.display()) }),
+                    false,
+                );
             }
             let src = saved_theme()
                 .and_then(|t| std::fs::read_to_string(themes_dir().join(format!("{t}.json"))).ok())
                 .or_else(|| find("saga").map(|e| e.1.to_string()))
                 .unwrap_or_else(|| THEMES[0].1.to_string());
-            match std::fs::create_dir_all(themes_dir())
-                .and_then(|()| std::fs::write(&path, src)) {
-                Ok(()) => (json!({ "text": format!("wrote {} — edit it, then /theme {name}", path.display()) }), false),
-                Err(e) => (json!({ "text": format!("could not write {}: {e}", path.display()) }), false),
+            match std::fs::create_dir_all(themes_dir()).and_then(|()| std::fs::write(&path, src)) {
+                Ok(()) => (
+                    json!({ "text": format!("wrote {} — edit it, then /theme {name}", path.display()) }),
+                    false,
+                ),
+                Err(e) => (
+                    json!({ "text": format!("could not write {}: {e}", path.display()) }),
+                    false,
+                ),
             }
         }
-        ["reload", ..] => (json!({ "text": "theme files are read from disk on apply — /theme <name> re-applies" }), false),
+        ["reload", ..] => (
+            json!({ "text": "theme files are read from disk on apply — /theme <name> re-applies" }),
+            false,
+        ),
         [name] => {
             let msg = picker::apply(name);
             (json!({ "text": msg }), msg.starts_with("theme "))
         }
-        _ => (json!({ "text": "usage: /theme [<name> | new <name> | list]" }), false),
+        _ => (
+            json!({ "text": "usage: /theme [<name> | new <name> | list]" }),
+            false,
+        ),
     }
 }
 
@@ -310,7 +355,11 @@ fn handle(req: &Value) -> (Option<Value>, bool) {
             let argv: Vec<String> = params
                 .get("argv")
                 .and_then(Value::as_array)
-                .map(|a| a.iter().filter_map(|e| e.as_str().map(str::to_string)).collect())
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|e| e.as_str().map(str::to_string))
+                        .collect()
+                })
                 .unwrap_or_default();
             let name = params.get("name").and_then(Value::as_str).unwrap_or("");
             if name == "/theme" {
@@ -326,7 +375,9 @@ fn handle(req: &Value) -> (Option<Value>, bool) {
         "plugin/shutdown" => return (Some(json!({ "id": id, "result": {} })), true),
         _ => {
             return (
-                Some(json!({ "id": id, "error": { "code": -32601, "message": format!("method not found: {method}") } })),
+                Some(
+                    json!({ "id": id, "error": { "code": -32601, "message": format!("method not found: {method}") } }),
+                ),
                 false,
             );
         }
@@ -367,7 +418,9 @@ pub fn run() -> std::io::Result<()> {
     }
     if args.is_empty() {
         if std::io::stdin().is_terminal() {
-            eprintln!("gray-themes is a plugin sidecar — drive it via `gray themes …` or install with `gray plugin install`");
+            eprintln!(
+                "gray-themes is a plugin sidecar — drive it via `gray themes …` or install with `gray plugin install`"
+            );
             return Ok(());
         }
         let stdin = std::io::stdin();
