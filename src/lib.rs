@@ -250,25 +250,32 @@ fn run_cmd(argv: &[String], persist: bool) -> String {
     }
 }
 
-/// `/theme` surface: bare hands the terminal to the picker; `list`/`new`/`<name>`
-/// answer inline. Applies request a host restart (config is written first).
+fn theme_list() -> String {
+    let active = saved_theme();
+    let mut out = format!("themes — ~/.gray/themes + {} pack palettes\n", THEMES.len());
+    for r in picker::rows() {
+        let mark = if active.as_deref() == Some(r.name.as_str())
+            || (active.is_none() && r.builtin) { "●" } else { " " };
+        let tag = if r.builtin { " (built-in)" }
+            else if !r.installed { " — pack, installs on apply" } else { "" };
+        out.push_str(&format!("  {mark} {}{tag}\n", r.name));
+    }
+    out.push_str("/theme <name> to switch · /theme new <name> to copy the saved one");
+    out
+}
+
 fn theme_run(argv: &[String]) -> (Value, bool) {
     let arg = argv.first().map(String::as_str).unwrap_or("");
     match arg.split_whitespace().collect::<Vec<_>>().as_slice() {
-        [] => (json!({ "terminal": ["theme"], "text": "opening the theme picker…" }), false),
-        ["list"] => {
-            let active = saved_theme();
-            let mut out = format!("themes — ~/.gray/themes + {} pack palettes\n", THEMES.len());
-            for r in picker::rows() {
-                let mark = if active.as_deref() == Some(r.name.as_str())
-                    || (active.is_none() && r.builtin) { "●" } else { " " };
-                let tag = if r.builtin { " (built-in)" }
-                    else if !r.installed { " — pack, installs on apply" } else { "" };
-                out.push_str(&format!("  {mark} {}{tag}\n", r.name));
+        [] => {
+            for entry in THEMES {
+                if !installed(entry.0) {
+                    let _ = install(entry);
+                }
             }
-            out.push_str("/theme <name> to switch · /theme new <name> to copy the saved one");
-            (json!({ "text": out }), false)
+            (json!({ "theme_picker": true, "text": theme_list() }), false)
         }
+        ["list"] => (json!({ "text": theme_list() }), false),
         ["new", name] => {
             if name.is_empty() || !name.chars().all(|c| c.is_ascii_alphanumeric() || "-_".contains(c))
                 || *name == "gray" || name.eq_ignore_ascii_case("default") {
