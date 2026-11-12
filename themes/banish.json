@@ -51,7 +51,6 @@
     "ctx_system": "#afafaa",
     "ctx_context": "green",
     "ctx_tools": "cyan",
-    "ctx_skills": "yellow",
     "ctx_messages": "orange",
     "ctx_free": "#5b605e",
     "shimmer_base": "#afafaa",

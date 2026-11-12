@@ -168,7 +168,6 @@ def convert(name, src, source_url):
         "ctx_system": h(mix(muted, fg, 0.55)),
         "ctx_context": "green",
         "ctx_tools": "cyan",
-        "ctx_skills": "yellow",
         "ctx_messages": "orange",
         "ctx_free": h(mix(muted, bg, 0.3)),
         "shimmer_base": h(mix(muted, fg, 0.55)),
