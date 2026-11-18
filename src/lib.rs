@@ -64,6 +64,7 @@ fn manifest() -> Value {
         "version": env!("CARGO_PKG_VERSION"),
         "protocol": "1.1",
         "tools": [],
+        "description": "color themes and palettes",
         "commands": ["/theme", "/palettes"],
         "command_descriptions": {
             "/theme": "switch the color theme",
@@ -72,7 +73,14 @@ fn manifest() -> Value {
         "turn_local": {"/theme": ["*"], "/palettes": ["*"]},
         "hooks": [],
         "capabilities": ["host.restart"],
-        "completion": ["list", "use", "install", "show", "path", "new"],
+        "completion": [
+            {"arg": "list", "description": "list the available themes"},
+            {"arg": "use", "description": "switch to a theme"},
+            {"arg": "install", "description": "install a theme or palette pack"},
+            {"arg": "show", "description": "show a theme's colors"},
+            {"arg": "path", "description": "print the themes directory"},
+            {"arg": "new", "description": "scaffold a new theme"},
+        ],
     })
 }
 
