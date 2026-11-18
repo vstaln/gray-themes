@@ -66,6 +66,10 @@ fn manifest() -> Value {
         "tools": [],
         "description": "color themes and palettes",
         "commands": ["/theme", "/palettes"],
+        "command_descriptions": {
+            "/theme": "switch the color theme",
+            "/palettes": "list and install color palettes",
+        },
         "turn_local": {"/theme": ["*"], "/palettes": ["*"]},
         "hooks": [],
         "capabilities": ["host.restart"],
